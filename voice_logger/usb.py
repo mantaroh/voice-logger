@@ -30,5 +30,12 @@ def collect_audio_files(mount: Path, source_subdir: str, audio_extensions: tuple
         files.extend(root.rglob(f"*{ext}"))
         files.extend(root.rglob(f"*{ext.upper()}"))
 
-    unique: dict[str, Path] = {str(p): p for p in files if p.is_file()}
+    unique: dict[str, Path] = {}
+    for p in files:
+        if not p.is_file():
+            continue
+        # Skip hidden files and AppleDouble metadata files (e.g. ._Rxxxx.WAV on macOS volumes).
+        if p.name.startswith(".") or p.name.startswith("._"):
+            continue
+        unique[str(p)] = p
     return sorted(unique.values())

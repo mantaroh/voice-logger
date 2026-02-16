@@ -8,3 +8,4 @@ venv/
 .DS_Store
 voice-logger-data/
 config.toml
+*.egg-info/

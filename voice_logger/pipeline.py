@@ -150,9 +150,14 @@ def run_once(cfg: Config, state: StateStore, progress_cb: ProgressCallback | Non
                         current=idx,
                     ),
                 )
-                summary = summarize_text(transcript, cfg.summarizer)
-                task.summary_path.write_text(summary, encoding="utf-8")
-                summary_path_str = str(task.summary_path)
+                try:
+                    summary = summarize_text(transcript, cfg.summarizer)
+                    task.summary_path.write_text(summary, encoding="utf-8")
+                    summary_path_str = str(task.summary_path)
+                except Exception as e:
+                    LOGGER.warning("Summary failed for %s: %s", task.relative_path, e)
+                    task.summary_path.write_text(f"Summary failed: {e}\n", encoding="utf-8")
+                    summary_path_str = str(task.summary_path)
 
             st = source.stat() if source.exists() else task.copied_path.stat()
             state.mark_processed(

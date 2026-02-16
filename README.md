@@ -48,7 +48,7 @@ Edit `config.toml`:
 `install_whisper_kotoba.sh` installs:
 
 - `whisper.cpp` (`whisper-cli`)
-- `kotoba-whisper-v2.2` model (auto-detected gguf/ggml from Hugging Face)
+- `kotoba-whisper-v2.2` model (`ggml-kotoba-v2.2-q5_0.bin` from Pomni HF repo)
 
 Override options (if needed):
 
@@ -126,7 +126,7 @@ systemctl --user enable --now voice-logger.service
 
 ## API keys
 
-Set the env var matching `[summarizer].api_key_env`, for example:
+Set `api_key_env` to either an environment variable name or a direct API key value. Env var is recommended. Example with env vars:
 
 ```bash
 export OPENAI_API_KEY=...
@@ -135,7 +135,7 @@ export GEMINI_API_KEY=...
 export OPENROUTER_API_KEY=...
 ```
 
-For Cloudflare AI Gateway, set `provider = "cloudflare"` and configure an OpenAI-compatible `endpoint`.
+For Cloudflare AI Gateway (compat), use an endpoint ending with `/compat` or `/compat/chat/completions`. If `/compat` is set, the app auto-appends `/chat/completions`. Also set model as OpenAI-compatible id (e.g. `gpt-5-mini-2025-08-07`); for Cloudflare compat the app auto-prefixes `openai/` when missing.
 
 ## Uninstall whisper.cpp / kotoba model
 

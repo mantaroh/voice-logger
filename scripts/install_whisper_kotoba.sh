@@ -5,8 +5,7 @@ INSTALL_PREFIX="${VOICE_LOGGER_INSTALL_PREFIX:-$HOME/.local/share/voice-logger}"
 BIN_DIR="${VOICE_LOGGER_BIN_DIR:-$HOME/.local/bin}"
 WHISPER_CPP_REPO="${WHISPER_CPP_REPO:-https://github.com/ggml-org/whisper.cpp.git}"
 WHISPER_CPP_REF="${WHISPER_CPP_REF:-master}"
-KOTOBA_HF_REPO="${KOTOBA_HF_REPO:-kotoba-tech/kotoba-whisper-v2.2}"
-KOTOBA_MODEL_URL="${KOTOBA_MODEL_URL:-}"
+KOTOBA_MODEL_URL="${KOTOBA_MODEL_URL:-https://huggingface.co/Pomni/kotoba-whisper-v2.2-ggml-allquants/resolve/main/ggml-kotoba-v2.2-q5_0.bin?download=true}"
 
 WHISPER_SRC_DIR="$INSTALL_PREFIX/whisper.cpp"
 WHISPER_BUILD_DIR="$WHISPER_SRC_DIR/build"
@@ -29,37 +28,6 @@ cpu_jobs() {
   else
     echo 4
   fi
-}
-
-find_kotoba_model_url() {
-  local api="https://huggingface.co/api/models/${KOTOBA_HF_REPO}"
-  local picked
-  picked="$(curl -fsSL "$api" | python3 -c '
-import json,sys
-obj=json.load(sys.stdin)
-files=[x.get("rfilename","") for x in obj.get("siblings",[])]
-rank=[]
-for f in files:
-    lf=f.lower()
-    if lf.endswith(".gguf"):
-        score=0
-    elif "ggml" in lf and lf.endswith(".bin"):
-        score=1
-    else:
-        continue
-    rank.append((score, len(lf), f))
-if not rank:
-    print("")
-else:
-    rank.sort()
-    print(rank[0][2])
-')"
-
-  if [[ -z "$picked" ]]; then
-    return 1
-  fi
-
-  echo "https://huggingface.co/${KOTOBA_HF_REPO}/resolve/main/${picked}"
 }
 
 echo "[1/4] checking prerequisites"
@@ -100,14 +68,6 @@ chmod +x "$WHISPER_INSTALL_BIN"
 ln -sfn "$WHISPER_INSTALL_BIN" "$BIN_DIR/whisper-cli"
 
 echo "[3/4] downloading kotoba-whisper2.2 model"
-if [[ -z "$KOTOBA_MODEL_URL" ]]; then
-  if ! KOTOBA_MODEL_URL="$(find_kotoba_model_url)"; then
-    echo "[ERROR] no gguf/ggml model file found in $KOTOBA_HF_REPO" >&2
-    echo "        set KOTOBA_MODEL_URL and rerun" >&2
-    exit 1
-  fi
-fi
-
 MODEL_FILENAME="$(basename "${KOTOBA_MODEL_URL%%\?*}")"
 MODEL_PATH="$MODEL_DIR/$MODEL_FILENAME"
 curl -fL "$KOTOBA_MODEL_URL" -o "$MODEL_PATH"

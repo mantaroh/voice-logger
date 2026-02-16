@@ -8,7 +8,11 @@ from .config import WhisperConfig
 
 def transcribe_with_whisper_cpp(audio_path: Path, output_txt_path: Path, cfg: WhisperConfig) -> str:
     output_txt_path.parent.mkdir(parents=True, exist_ok=True)
-    output_base = output_txt_path.with_suffix("")
+    # Keep all dots in basename; only strip trailing ".txt" if present.
+    if output_txt_path.suffix.lower() == ".txt":
+        output_base = output_txt_path.with_name(output_txt_path.name[:-4])
+    else:
+        output_base = output_txt_path
 
     cmd = [
         str(cfg.cli_path),
@@ -30,7 +34,7 @@ def transcribe_with_whisper_cpp(audio_path: Path, output_txt_path: Path, cfg: Wh
             f"whisper.cpp failed ({proc.returncode})\\nSTDOUT:\\n{proc.stdout}\\nSTDERR:\\n{proc.stderr}"
         )
 
-    actual_txt = output_base.with_suffix(".txt")
+    actual_txt = Path(f"{output_base}.txt")
     if not actual_txt.exists():
         raise RuntimeError(f"whisper.cpp completed but output not found: {actual_txt}")
 

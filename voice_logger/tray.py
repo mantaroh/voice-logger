@@ -101,7 +101,7 @@ class SettingsDialog(QDialog):
         form.addRow("Summarizer model", self.summarizer_model)
 
         self.summarizer_api_env = QLineEdit(cfg.summarizer.api_key_env, self)
-        form.addRow("Summarizer API key env", self.summarizer_api_env)
+        form.addRow("Summarizer API key env (or direct key)", self.summarizer_api_env)
 
         self.summarizer_endpoint = QLineEdit(cfg.summarizer.endpoint, self)
         form.addRow("Summarizer endpoint", self.summarizer_endpoint)
@@ -348,7 +348,8 @@ class TrayApp(QObject):
         painter.setPen(Qt.PenStyle.NoPen)
         painter.drawEllipse(4, 4, 24, 24)
         if badge_text:
-            font = QFont("Sans Serif", 8)
+            font = QApplication.font()
+            font.setPointSize(8)
             font.setBold(True)
             painter.setFont(font)
             painter.setPen(Qt.GlobalColor.white)

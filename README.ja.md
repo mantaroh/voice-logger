@@ -118,7 +118,7 @@ cp config.example.toml config.toml
 `install_whisper_kotoba.sh` は以下をインストールします:
 
 - `whisper.cpp`（`whisper-cli`）
-- `kotoba-whisper-v2.2` モデル（Hugging Face から gguf/ggml を自動判定）
+- `kotoba-whisper-v2.2` モデル（Pomni の `ggml-kotoba-v2.2-q5_0.bin` を既定で取得）
 
 必要なら上書き指定できます:
 
@@ -201,7 +201,7 @@ systemctl --user enable --now voice-logger.service
 
 ## LLM APIキー
 
-`config.toml` の `api_key_env` に合わせて設定:
+`api_key_env` には「環境変数名」または「APIキー文字列」を指定できます（推奨: 環境変数名）。環境変数を使う場合:
 
 ```bash
 export OPENAI_API_KEY=...
@@ -210,7 +210,7 @@ export GEMINI_API_KEY=...
 export OPENROUTER_API_KEY=...
 ```
 
-Cloudflare AI Gateway を使う場合は `provider = "cloudflare"` と `endpoint` を OpenAI互換エンドポイントに設定してください。
+Cloudflare AI Gateway（compat）を使う場合は、`endpoint` を `/compat` または `/compat/chat/completions` で終わるURLに設定してください（`/compat` 指定時は自動で `/chat/completions` を補完）。また model は OpenAI互換ID（例: `gpt-5-mini-2025-08-07`）を設定してください。Cloudflare compat 利用時は `openai/` プレフィックスが未指定なら自動補完します。
 
 ## whisper.cpp / kotobaモデルのアンインストール
 
