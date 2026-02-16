@@ -51,20 +51,12 @@ class SummarizerConfig:
 
 
 @dataclass(slots=True)
-class RecorderConfig:
-    enabled: bool = False
-    command: list[str] = field(default_factory=list)
-    cwd: str = ""
-
-
-@dataclass(slots=True)
 class Config:
     app: AppConfig
     usb: UsbConfig
     storage: StorageConfig
     whisper: WhisperConfig
     summarizer: SummarizerConfig
-    recorder: RecorderConfig
 
 
 def _default_mount_roots() -> list[Path]:
@@ -97,7 +89,6 @@ def load_config(path: Path) -> Config:
     storage_data = data.get("storage", {})
     whisper_data = data.get("whisper", {})
     summarizer_data = data.get("summarizer", {})
-    recorder_data = data.get("recorder", {})
 
     device_name = usb_data.get("device_name", "").strip()
     if not device_name:
@@ -180,20 +171,66 @@ def load_config(path: Path) -> Config:
                 )
             ),
         ),
-        recorder=RecorderConfig(
-            enabled=bool(recorder_data.get("enabled", False)),
-            command=list(recorder_data.get("command", [])),
-            cwd=str(recorder_data.get("cwd", "")).strip(),
-        ),
     )
 
     if cfg.app.poll_interval_seconds < 1:
         raise ValueError("[app].poll_interval_seconds must be >= 1")
 
-    if cfg.recorder.enabled and not cfg.recorder.command:
-        raise ValueError("[recorder] enabled=true requires command")
-
     if sys.platform.startswith("darwin") and Path("/Volumes") not in cfg.usb.mount_roots:
         cfg.usb.mount_roots.insert(0, Path("/Volumes"))
 
     return cfg
+
+
+def _toml_escape(s: str) -> str:
+    return s.replace("\\", "\\\\").replace('"', '\\"')
+
+
+def _toml_string(s: str) -> str:
+    return f"\"{_toml_escape(s)}\""
+
+
+def _toml_str_list(items: list[str]) -> str:
+    return "[" + ", ".join(_toml_string(i) for i in items) + "]"
+
+
+def save_config(path: Path, cfg: Config) -> None:
+    path = path.expanduser().resolve()
+    lines: list[str] = []
+
+    lines.extend([
+        "[app]",
+        f"poll_interval_seconds = {cfg.app.poll_interval_seconds}",
+        f"log_level = {_toml_string(cfg.app.log_level)}",
+        "",
+        "[usb]",
+        f"device_name = {_toml_string(cfg.usb.device_name)}",
+        f"mount_roots = {_toml_str_list([str(p) for p in cfg.usb.mount_roots])}",
+        f"source_subdir = {_toml_string(cfg.usb.source_subdir)}",
+        f"audio_extensions = {_toml_str_list(list(cfg.usb.audio_extensions))}",
+        "",
+        "[storage]",
+        f"base_dir = {_toml_string(str(cfg.storage.base_dir))}",
+        f"raw_dir_name = {_toml_string(cfg.storage.raw_dir_name)}",
+        f"transcript_dir_name = {_toml_string(cfg.storage.transcript_dir_name)}",
+        f"summary_dir_name = {_toml_string(cfg.storage.summary_dir_name)}",
+        f"state_file_name = {_toml_string(cfg.storage.state_file_name)}",
+        "",
+        "[whisper]",
+        f"cli_path = {_toml_string(str(cfg.whisper.cli_path))}",
+        f"model_path = {_toml_string(str(cfg.whisper.model_path))}",
+        f"language = {_toml_string(cfg.whisper.language)}",
+        f"extra_args = {_toml_str_list(cfg.whisper.extra_args)}",
+        "",
+        "[summarizer]",
+        f"enabled = {'true' if cfg.summarizer.enabled else 'false'}",
+        f"provider = {_toml_string(cfg.summarizer.provider)}",
+        f"model = {_toml_string(cfg.summarizer.model)}",
+        f"api_key_env = {_toml_string(cfg.summarizer.api_key_env)}",
+        f"endpoint = {_toml_string(cfg.summarizer.endpoint)}",
+        f"system_prompt = {_toml_string(cfg.summarizer.system_prompt)}",
+        "",
+    ])
+
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text("\n".join(lines), encoding="utf-8")

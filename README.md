@@ -17,21 +17,21 @@ It should also work with other USB-recognizable voice recorders that expose audi
 - Transcription via `whisper.cpp`
 - Optional summarization with configurable provider:
   - `openai`, `anthropic`, `gemini`, `openrouter`, `cloudflare`
-- Optional always-on recorder command (`[recorder]`, e.g. `ffmpeg`)
 - Tray UI for macOS menu bar / Ubuntu system tray
+- Settings window from tray menu (`Settings...`) to edit `config.toml`
 - CLI mode (`run`, `once`)
 
 ## Requirements
 
 - Python `3.11+`
-- `whisper.cpp` (`whisper-cli`)
-- `kotoba-whisper2.2` model file (gguf/bin)
 - GUI session (for tray mode)
+- `git`, `cmake`, `curl`, C++ compiler (`clang++` or `g++`) for install script
 
 ## Install
 
 ```bash
 cd /Users/mantaroh/code/voice-logger
+./scripts/install_whisper_kotoba.sh
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -e .
@@ -44,7 +44,18 @@ Edit `config.toml`:
 - `[storage].base_dir`
 - `[whisper].cli_path`, `[whisper].model_path`
 - `[summarizer]` (optional)
-- `[recorder]` (optional)
+
+`install_whisper_kotoba.sh` installs:
+
+- `whisper.cpp` (`whisper-cli`)
+- `kotoba-whisper-v2.2` model (auto-detected gguf/ggml from Hugging Face)
+
+Override options (if needed):
+
+```bash
+KOTOBA_MODEL_URL=\"https://.../model.gguf\" ./scripts/install_whisper_kotoba.sh
+VOICE_LOGGER_INSTALL_PREFIX=\"$HOME/.local/share/voice-logger\" ./scripts/install_whisper_kotoba.sh
+```
 
 ## Run
 
@@ -53,6 +64,8 @@ Tray mode (recommended):
 ```bash
 voice-logger-tray --config /Users/mantaroh/code/voice-logger/config.toml
 ```
+
+Open `Settings...` from the tray menu to edit and save runtime configuration.
 
 CLI once:
 
@@ -123,3 +136,10 @@ export OPENROUTER_API_KEY=...
 ```
 
 For Cloudflare AI Gateway, set `provider = "cloudflare"` and configure an OpenAI-compatible `endpoint`.
+
+## Uninstall whisper.cpp / kotoba model
+
+```bash
+cd /Users/mantaroh/code/voice-logger
+./scripts/uninstall_whisper_kotoba.sh
+```

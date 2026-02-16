@@ -20,9 +20,9 @@ state_file_name = ".voice_logger_state.json"
 
 [whisper]
 # whisper.cpp の実行ファイル (whisper-cli)
-cli_path = "~/bin/whisper-cli"
+cli_path = "~/.local/share/voice-logger/bin/whisper-cli"
 # kotoba-whisper2.2 の gguf / bin モデルパス
-model_path = "~/models/kotoba-whisper-v2.2.gguf"
+model_path = "~/.local/share/voice-logger/models/kotoba-whisper-v2.2/kotoba-whisper-v2.2.bin"
 language = "ja"
 # 例: ["-t", "8", "-oj"]
 extra_args = ["-t", "8"]
@@ -37,11 +37,3 @@ api_key_env = "OPENAI_API_KEY"
 # openai/openrouter/cloudflare では指定推奨。未指定時はopenai/openrouterのみデフォルトあり
 endpoint = "https://api.openai.com/v1/chat/completions"
 system_prompt = "以下は会話の文字起こしです。要点、決定事項、TODO、懸念事項を日本語で簡潔に箇条書きしてください。"
-
-[recorder]
-# true の場合、常時録音コマンドを同時実行（例: ffmpeg）
-enabled = false
-# 例（Linux PulseAudio）:
-# command = ["ffmpeg", "-f", "pulse", "-i", "default", "-c:a", "aac", "-f", "segment", "-segment_time", "3600", "/path/to/out/%Y%m%d_%H%M%S.m4a"]
-command = []
-cwd = ""

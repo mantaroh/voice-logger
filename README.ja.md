@@ -17,17 +17,16 @@ USB録音デバイスを監視し、新規音声をローカル保存してUSB�
 - 取り込み成功後にUSB元ファイルを削除
 - `whisper.cpp` 実行で文字起こし保存
 - 要約プロバイダ切り替え（`openai / anthropic / gemini / openrouter / cloudflare`）
-- 任意で24時間録音コマンドを並行実行（`[recorder]`）
 - トレイ常駐実行（`voice-logger-tray`）
+- トレイメニューの `Settings...` から `config.toml` を編集
 - CLI実行 (`run`, `once`)
 - 起動時自動実行テンプレート（`launchd`, `autostart .desktop`, `systemd --user`）
 
 ## 要件
 
 - Python `3.11+`
-- `whisper.cpp` の `whisper-cli`
-- `kotoba-whisper2.2` モデルファイル（gguf/bin）
 - GUIセッション（トレイ表示のため）
+- インストールスクリプト用に `git`, `cmake`, `curl`, C++コンパイラ（`clang++` または `g++`）
 
 ## macOS / Ubuntu インストールと起動
 
@@ -37,6 +36,7 @@ USB録音デバイスを監視し、新規音声をローカル保存してUSB�
 
 ```bash
 cd /Users/mantaroh/code/voice-logger
+./scripts/install_whisper_kotoba.sh
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -e .
@@ -50,6 +50,8 @@ cp config.example.toml config.toml
 source /Users/mantaroh/code/voice-logger/.venv/bin/activate
 voice-logger-tray --config /Users/mantaroh/code/voice-logger/config.toml
 ```
+
+トレイメニューの `Settings...` から設定を編集・保存できます。
 
 4. ログイン時自動起動
 
@@ -112,7 +114,18 @@ cp config.example.toml config.toml
 - `[storage].base_dir`: ローカル保存先
 - `[whisper].cli_path`, `[whisper].model_path`
 - `[summarizer]`（有効時）
-- `[recorder]`（24時間録音を同時実行する場合）
+
+`install_whisper_kotoba.sh` は以下をインストールします:
+
+- `whisper.cpp`（`whisper-cli`）
+- `kotoba-whisper-v2.2` モデル（Hugging Face から gguf/ggml を自動判定）
+
+必要なら上書き指定できます:
+
+```bash
+KOTOBA_MODEL_URL=\"https://.../model.gguf\" ./scripts/install_whisper_kotoba.sh
+VOICE_LOGGER_INSTALL_PREFIX=\"$HOME/.local/share/voice-logger\" ./scripts/install_whisper_kotoba.sh
+```
 
 ## 実行
 
@@ -199,13 +212,14 @@ export OPENROUTER_API_KEY=...
 
 Cloudflare AI Gateway を使う場合は `provider = "cloudflare"` と `endpoint` を OpenAI互換エンドポイントに設定してください。
 
-## 24時間録音（任意）
+## whisper.cpp / kotobaモデルのアンインストール
 
-`config.toml` の `[recorder]` を有効化すると、常駐中に録音コマンドを起動し、終了した場合は自動再起動します。
-録音コマンド例は `config.example.toml` を参照してください。
+```bash
+cd /Users/mantaroh/code/voice-logger
+./scripts/uninstall_whisper_kotoba.sh
+```
 
 ## 注意
 
 - USBファイル削除は「コピー成功後」に実行します。
 - 文字起こし/要約が失敗しても、コピー済み音声はローカルに残ります。
-- USBファイル取り込みと `recorder` の録音先は別管理です。用途に応じてパスを分けてください。

@@ -3,7 +3,6 @@ from __future__ import annotations
 import argparse
 import logging
 import signal
-import subprocess
 import sys
 import time
 from pathlib import Path
@@ -36,7 +35,6 @@ def run_loop(config_path: Path) -> int:
     state.load()
 
     stop = {"value": False}
-    recorder_proc: subprocess.Popen | None = None
 
     def handle_signal(signum: int, _frame) -> None:
         logging.getLogger(__name__).info("Received signal %s, shutting down", signum)
@@ -45,22 +43,7 @@ def run_loop(config_path: Path) -> int:
     signal.signal(signal.SIGINT, handle_signal)
     signal.signal(signal.SIGTERM, handle_signal)
 
-    if cfg.recorder.enabled:
-        recorder_proc = subprocess.Popen(
-            cfg.recorder.command,
-            cwd=cfg.recorder.cwd or None,
-        )
-        logging.getLogger(__name__).info("Recorder started: pid=%s", recorder_proc.pid)
-
     while not stop["value"]:
-        if cfg.recorder.enabled and recorder_proc is not None and recorder_proc.poll() is not None:
-            logging.getLogger(__name__).warning("Recorder exited. restarting...")
-            recorder_proc = subprocess.Popen(
-                cfg.recorder.command,
-                cwd=cfg.recorder.cwd or None,
-            )
-            logging.getLogger(__name__).info("Recorder restarted: pid=%s", recorder_proc.pid)
-
         result = run_once(cfg, state)
         logging.getLogger(__name__).debug(
             "Scan finished: scanned=%s processed=%s failed=%s",
@@ -69,13 +52,6 @@ def run_loop(config_path: Path) -> int:
             result.failed,
         )
         time.sleep(cfg.app.poll_interval_seconds)
-
-    if recorder_proc is not None and recorder_proc.poll() is None:
-        recorder_proc.terminate()
-        try:
-            recorder_proc.wait(timeout=10)
-        except subprocess.TimeoutExpired:
-            recorder_proc.kill()
 
     return 0
 
