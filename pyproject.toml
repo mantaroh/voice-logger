@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "voice-logger"
+version = "0.1.0"
+description = "USB audio ingestion + whisper.cpp transcription + optional LLM summarization"
+requires-python = ">=3.11"
+readme = "README.md"
+authors = [{ name = "voice-logger" }]
+license = { text = "MIT" }
+dependencies = ["PySide6>=6.6"]
+
+[project.scripts]
+voice-logger = "voice_logger.main:main"
+voice-logger-tray = "voice_logger.tray:main"
+
+[tool.setuptools]
+packages = ["voice_logger"]

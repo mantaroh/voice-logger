@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.mantaroh.voice-logger</string>
+
+  <key>ProgramArguments</key>
+  <array>
+    <string>/usr/bin/env</string>
+    <string>python3</string>
+    <string>-m</string>
+    <string>voice_logger.tray</string>
+    <string>--config</string>
+    <string>/Users/mantaroh/code/voice-logger/config.toml</string>
+  </array>
+
+  <key>WorkingDirectory</key>
+  <string>/Users/mantaroh/code/voice-logger</string>
+
+  <key>RunAtLoad</key>
+  <true/>
+
+  <key>StandardOutPath</key>
+  <string>/Users/mantaroh/Library/Logs/voice-logger.log</string>
+  <key>StandardErrorPath</key>
+  <string>/Users/mantaroh/Library/Logs/voice-logger.err.log</string>
+
+  <!-- 環境変数の例 -->
+  <!--
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>OPENAI_API_KEY</key>
+    <string>xxxx</string>
+  </dict>
+  -->
+</dict>
+</plist>

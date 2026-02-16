@@ -1,0 +1,47 @@
+[app]
+poll_interval_seconds = 10
+log_level = "INFO"
+
+[usb]
+# マウント名（/Volumes/<name> や /media/$USER/<name> の <name>）
+device_name = "VOICE_RECORDER"
+# 任意。未指定ならOS別デフォルトを自動利用
+mount_roots = ["/Volumes", "/media/mantaroh", "/run/media/mantaroh", "/mnt"]
+# USB内の探索開始ディレクトリ。空ならUSBルート全体
+source_subdir = ""
+audio_extensions = [".wav", ".mp3", ".m4a", ".aac", ".flac", ".ogg", ".mp4"]
+
+[storage]
+base_dir = "~/voice-logger-data"
+raw_dir_name = "raw"
+transcript_dir_name = "transcripts"
+summary_dir_name = "summaries"
+state_file_name = ".voice_logger_state.json"
+
+[whisper]
+# whisper.cpp の実行ファイル (whisper-cli)
+cli_path = "~/bin/whisper-cli"
+# kotoba-whisper2.2 の gguf / bin モデルパス
+model_path = "~/models/kotoba-whisper-v2.2.gguf"
+language = "ja"
+# 例: ["-t", "8", "-oj"]
+extra_args = ["-t", "8"]
+
+[summarizer]
+enabled = true
+# openai | anthropic | gemini | openrouter | cloudflare
+provider = "openai"
+model = "gpt-4o-mini"
+# APIキーを格納した環境変数名
+api_key_env = "OPENAI_API_KEY"
+# openai/openrouter/cloudflare では指定推奨。未指定時はopenai/openrouterのみデフォルトあり
+endpoint = "https://api.openai.com/v1/chat/completions"
+system_prompt = "以下は会話の文字起こしです。要点、決定事項、TODO、懸念事項を日本語で簡潔に箇条書きしてください。"
+
+[recorder]
+# true の場合、常時録音コマンドを同時実行（例: ffmpeg）
+enabled = false
+# 例（Linux PulseAudio）:
+# command = ["ffmpeg", "-f", "pulse", "-i", "default", "-c:a", "aac", "-f", "segment", "-segment_time", "3600", "/path/to/out/%Y%m%d_%H%M%S.m4a"]
+command = []
+cwd = ""

@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Voice Logger Tray
+Comment=USB audio monitor and transcriber tray app
+Exec=/usr/bin/env voice-logger-tray --config /Users/mantaroh/code/voice-logger/config.toml
+Terminal=false
+Categories=Utility;
+StartupNotify=false
+X-GNOME-Autostart-enabled=true

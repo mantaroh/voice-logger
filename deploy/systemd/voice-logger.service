@@ -1,0 +1,19 @@
+[Unit]
+Description=Voice Logger Daemon
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/code/voice-logger
+ExecStart=%h/.pyenv/shims/python -m voice_logger.main --config %h/code/voice-logger/config.toml run
+Restart=always
+RestartSec=5
+Environment=PYTHONUNBUFFERED=1
+# Environment=OPENAI_API_KEY=xxx
+# Environment=ANTHROPIC_API_KEY=xxx
+# Environment=GEMINI_API_KEY=xxx
+# Environment=OPENROUTER_API_KEY=xxx
+
+[Install]
+WantedBy=default.target
