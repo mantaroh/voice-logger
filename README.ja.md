@@ -35,7 +35,7 @@ USB録音デバイスを監視し、新規音声をローカル保存してUSB�
 1. セットアップ
 
 ```bash
-cd /Users/mantaroh/code/voice-logger
+cd $HOME/code/voice-logger
 ./scripts/install_whisper_kotoba.sh
 python3 -m venv .venv
 source .venv/bin/activate
@@ -47,8 +47,8 @@ cp config.example.toml config.toml
 3. 手動起動（トレイ）
 
 ```bash
-source /Users/mantaroh/code/voice-logger/.venv/bin/activate
-voice-logger-tray --config /Users/mantaroh/code/voice-logger/config.toml
+source $HOME/code/voice-logger/.venv/bin/activate
+voice-logger-tray --config $HOME/code/voice-logger/config.toml
 ```
 
 トレイメニューの `Settings...` から設定を編集・保存できます。
@@ -56,10 +56,10 @@ voice-logger-tray --config /Users/mantaroh/code/voice-logger/config.toml
 4. ログイン時自動起動
 
 ```bash
-cp /Users/mantaroh/code/voice-logger/deploy/launchd/com.mantaroh.voice-logger.plist ~/Library/LaunchAgents/
-launchctl unload ~/Library/LaunchAgents/com.mantaroh.voice-logger.plist 2>/dev/null || true
-launchctl load ~/Library/LaunchAgents/com.mantaroh.voice-logger.plist
-launchctl start com.mantaroh.voice-logger
+cp $HOME/code/voice-logger/deploy/launchd/com.voice-logger.plist ~/Library/LaunchAgents/
+launchctl unload ~/Library/LaunchAgents/com.voice-logger.plist 2>/dev/null || true
+launchctl load ~/Library/LaunchAgents/com.voice-logger.plist
+launchctl start com.voice-logger
 ```
 
 ### Ubuntu
@@ -67,7 +67,7 @@ launchctl start com.mantaroh.voice-logger
 1. セットアップ
 
 ```bash
-cd /Users/mantaroh/code/voice-logger
+cd $HOME/code/voice-logger
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -e .
@@ -78,22 +78,22 @@ cp config.example.toml config.toml
 3. 手動起動（トレイ）
 
 ```bash
-source /Users/mantaroh/code/voice-logger/.venv/bin/activate
-voice-logger-tray --config /Users/mantaroh/code/voice-logger/config.toml
+source $HOME/code/voice-logger/.venv/bin/activate
+voice-logger-tray --config $HOME/code/voice-logger/config.toml
 ```
 
 4. GUIログイン時にトレイ自動起動
 
 ```bash
 mkdir -p ~/.config/autostart
-cp /Users/mantaroh/code/voice-logger/deploy/autostart/voice-logger.desktop ~/.config/autostart/
+cp $HOME/code/voice-logger/deploy/autostart/voice-logger.desktop ~/.config/autostart/
 ```
 
 5. 参考: GUIなしサーバー用途（systemd --user）
 
 ```bash
 mkdir -p ~/.config/systemd/user
-cp /Users/mantaroh/code/voice-logger/deploy/systemd/voice-logger.service ~/.config/systemd/user/
+cp $HOME/code/voice-logger/deploy/systemd/voice-logger.service ~/.config/systemd/user/
 systemctl --user daemon-reload
 systemctl --user enable --now voice-logger.service
 ```
@@ -101,7 +101,7 @@ systemctl --user enable --now voice-logger.service
 ## セットアップ
 
 ```bash
-cd /Users/mantaroh/code/voice-logger
+cd $HOME/code/voice-logger
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -e .
@@ -132,7 +132,7 @@ VOICE_LOGGER_INSTALL_PREFIX=\"$HOME/.local/share/voice-logger\" ./scripts/instal
 トレイ常駐（推奨）:
 
 ```bash
-voice-logger-tray --config /Users/mantaroh/code/voice-logger/config.toml
+voice-logger-tray --config $HOME/code/voice-logger/config.toml
 ```
 
 トレイメニューから以下を操作できます:
@@ -154,13 +154,13 @@ voice-logger-tray --config /Users/mantaroh/code/voice-logger/config.toml
 単発:
 
 ```bash
-voice-logger --config /Users/mantaroh/code/voice-logger/config.toml once
+voice-logger --config $HOME/code/voice-logger/config.toml once
 ```
 
 常駐:
 
 ```bash
-voice-logger --config /Users/mantaroh/code/voice-logger/config.toml run
+voice-logger --config $HOME/code/voice-logger/config.toml run
 ```
 
 ## 出力
@@ -177,10 +177,10 @@ voice-logger --config /Users/mantaroh/code/voice-logger/config.toml run
 ### macOS (launchd: メニューバー常駐)
 
 ```bash
-cp deploy/launchd/com.mantaroh.voice-logger.plist ~/Library/LaunchAgents/
-launchctl unload ~/Library/LaunchAgents/com.mantaroh.voice-logger.plist 2>/dev/null || true
-launchctl load ~/Library/LaunchAgents/com.mantaroh.voice-logger.plist
-launchctl start com.mantaroh.voice-logger
+cp deploy/launchd/com.voice-logger.plist ~/Library/LaunchAgents/
+launchctl unload ~/Library/LaunchAgents/com.voice-logger.plist 2>/dev/null || true
+launchctl load ~/Library/LaunchAgents/com.voice-logger.plist
+launchctl start com.voice-logger
 ```
 
 ### Ubuntu (GUIログイン時にトレイ常駐)
@@ -215,7 +215,7 @@ Cloudflare AI Gateway（compat）を使う場合は、`endpoint` を `/compat` �
 ## whisper.cpp / kotobaモデルのアンインストール
 
 ```bash
-cd /Users/mantaroh/code/voice-logger
+cd $HOME/code/voice-logger
 ./scripts/uninstall_whisper_kotoba.sh
 ```
 

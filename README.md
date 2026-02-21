@@ -30,7 +30,7 @@ It should also work with other USB-recognizable voice recorders that expose audi
 ## Install
 
 ```bash
-cd /Users/mantaroh/code/voice-logger
+cd $HOME/code/voice-logger
 ./scripts/install_whisper_kotoba.sh
 python3 -m venv .venv
 source .venv/bin/activate
@@ -62,7 +62,7 @@ VOICE_LOGGER_INSTALL_PREFIX=\"$HOME/.local/share/voice-logger\" ./scripts/instal
 Tray mode (recommended):
 
 ```bash
-voice-logger-tray --config /Users/mantaroh/code/voice-logger/config.toml
+voice-logger-tray --config $HOME/code/voice-logger/config.toml
 ```
 
 Open `Settings...` from the tray menu to edit and save runtime configuration.
@@ -70,13 +70,13 @@ Open `Settings...` from the tray menu to edit and save runtime configuration.
 CLI once:
 
 ```bash
-voice-logger --config /Users/mantaroh/code/voice-logger/config.toml once
+voice-logger --config $HOME/code/voice-logger/config.toml once
 ```
 
 CLI daemon loop:
 
 ```bash
-voice-logger --config /Users/mantaroh/code/voice-logger/config.toml run
+voice-logger --config $HOME/code/voice-logger/config.toml run
 ```
 
 ## Tray icon states
@@ -102,24 +102,24 @@ Under `[storage].base_dir`:
 ### macOS (launchd, tray)
 
 ```bash
-cp /Users/mantaroh/code/voice-logger/deploy/launchd/com.mantaroh.voice-logger.plist ~/Library/LaunchAgents/
-launchctl unload ~/Library/LaunchAgents/com.mantaroh.voice-logger.plist 2>/dev/null || true
-launchctl load ~/Library/LaunchAgents/com.mantaroh.voice-logger.plist
-launchctl start com.mantaroh.voice-logger
+cp $HOME/code/voice-logger/deploy/launchd/com.voice-logger.plist ~/Library/LaunchAgents/
+launchctl unload ~/Library/LaunchAgents/com.voice-logger.plist 2>/dev/null || true
+launchctl load ~/Library/LaunchAgents/com.voice-logger.plist
+launchctl start com.voice-logger
 ```
 
 ### Ubuntu (GUI login, tray)
 
 ```bash
 mkdir -p ~/.config/autostart
-cp /Users/mantaroh/code/voice-logger/deploy/autostart/voice-logger.desktop ~/.config/autostart/
+cp $HOME/code/voice-logger/deploy/autostart/voice-logger.desktop ~/.config/autostart/
 ```
 
 ### Ubuntu (optional, headless)
 
 ```bash
 mkdir -p ~/.config/systemd/user
-cp /Users/mantaroh/code/voice-logger/deploy/systemd/voice-logger.service ~/.config/systemd/user/
+cp $HOME/code/voice-logger/deploy/systemd/voice-logger.service ~/.config/systemd/user/
 systemctl --user daemon-reload
 systemctl --user enable --now voice-logger.service
 ```
@@ -140,6 +140,6 @@ For Cloudflare AI Gateway (compat), use an endpoint ending with `/compat` or `/c
 ## Uninstall whisper.cpp / kotoba model
 
 ```bash
-cd /Users/mantaroh/code/voice-logger
+cd $HOME/code/voice-logger
 ./scripts/uninstall_whisper_kotoba.sh
 ```

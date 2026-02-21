@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
   <key>Label</key>
-  <string>com.mantaroh.voice-logger</string>
+  <string>com.voice-logger</string>
 
   <key>ProgramArguments</key>
   <array>
@@ -12,19 +12,19 @@
     <string>-m</string>
     <string>voice_logger.tray</string>
     <string>--config</string>
-    <string>/Users/mantaroh/code/voice-logger/config.toml</string>
+    <string>$HOME/code/voice-logger/config.toml</string>
   </array>
 
   <key>WorkingDirectory</key>
-  <string>/Users/mantaroh/code/voice-logger</string>
+  <string>$HOME/code/voice-logger</string>
 
   <key>RunAtLoad</key>
   <true/>
 
   <key>StandardOutPath</key>
-  <string>/Users/mantaroh/Library/Logs/voice-logger.log</string>
+  <string>$HOME/Library/Logs/voice-logger.log</string>
   <key>StandardErrorPath</key>
-  <string>/Users/mantaroh/Library/Logs/voice-logger.err.log</string>
+  <string>$HOME/Library/Logs/voice-logger.err.log</string>
 
   <!-- 環境変数の例 -->
   <!--

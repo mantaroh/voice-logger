@@ -6,7 +6,7 @@ log_level = "INFO"
 # マウント名（/Volumes/<name> や /media/$USER/<name> の <name>）
 device_name = "VOICE_RECORDER"
 # 任意。未指定ならOS別デフォルトを自動利用
-mount_roots = ["/Volumes", "/media/mantaroh", "/run/media/mantaroh", "/mnt"]
+mount_roots = ["/Volumes", "/media/$USER", "/run/media/$USER", "/mnt"]
 # USB内の探索開始ディレクトリ。空ならUSBルート全体
 source_subdir = ""
 audio_extensions = [".wav", ".mp3", ".m4a", ".aac", ".flac", ".ogg", ".mp4"]
