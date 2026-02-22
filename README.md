@@ -4,6 +4,11 @@ English README. Japanese version: [README.ja.md](./README.ja.md)
 
 `voice-logger` is a macOS/Linux tray app that monitors a USB voice recorder, copies new audio files to local storage, deletes original files from USB, transcribes with `whisper.cpp + kotoba-whisper2.2`, and optionally summarizes with an LLM.
 
+## Purpose / Motivation
+
+This project is heavily inspired by the **MyLifeBits** vision. By continuously collecting daily voice logs and converting them into searchable, summarizable text, it aims to realize a **modern MyLifeBits** approach made practical by today’s local AI tooling and personal compute resources.
+Reference: [MyLifeBits - Wikipedia](https://en.wikipedia.org/wiki/MyLifeBits)
+
 ## Device compatibility note
 
 This project was originally built for **dexion mz008 64GB**.

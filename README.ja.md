@@ -4,6 +4,11 @@
 
 USB録音デバイスを監視し、新規音声をローカル保存してUSB上の元ファイルを削除、`whisper.cpp + kotoba-whisper2.2` で文字起こし、任意でLLM要約する `macOS/Linux` 向けアプリです。`macOSメニューバー / Ubuntuトレイ` の常駐UIで状態確認できます。
 
+## 目的・モチベーション
+
+本プロジェクトは **MyLifeBit** の思想に大きく影響を受けています。日々の音声ログを継続的に蓄積し、検索・要約しやすい形に変換することで、**今の時代のローカルAIと個人向け計算資源で実現できる MyLifeBit** を目指しています。
+参考: [MyLifeBits - Wikipedia](https://en.wikipedia.org/wiki/MyLifeBits)
+
 
 ## 対応デバイス注記
 
