@@ -22,6 +22,7 @@ It should also work with other USB-recognizable voice recorders that expose audi
 - Transcription via `whisper.cpp`
 - Optional summarization with configurable provider:
   - `openai`, `anthropic`, `gemini`, `openrouter`, `cloudflare`
+- Daily rollup summary generation per recording date (`daily_YYYY-MM-DD.md`)
 - Tray UI for macOS menu bar / Ubuntu system tray
 - Settings window from tray menu (`Settings...`) to edit `config.toml`
 - CLI mode (`run`, `once`)
@@ -100,6 +101,7 @@ Under `[storage].base_dir`:
 - `raw/`
 - `transcripts/`
 - `summaries/` (if enabled)
+  - `daily_YYYY-MM-DD.md` (daily rollup per recording date, if enabled)
 - `.voice_logger_state.json`
 
 ## Autostart

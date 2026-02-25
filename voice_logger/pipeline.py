@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+import re
 import shutil
 from dataclasses import dataclass
 from datetime import datetime
@@ -34,6 +35,8 @@ class ProgressEvent:
 
 
 ProgressCallback = Callable[[ProgressEvent], None]
+_FULL_DATETIME_RE = re.compile(r"(\d{4})[-_](\d{2})[-_](\d{2})[-_](\d{2})[-_](\d{2})[-_](\d{2})")
+_DATE_ONLY_RE = re.compile(r"(\d{4})[-_](\d{2})[-_](\d{2})")
 
 
 def _to_key(source_path: Path, mount: Path) -> str:
@@ -75,6 +78,91 @@ def _emit(cb: ProgressCallback | None, event: ProgressEvent) -> None:
         cb(event)
 
 
+def _extract_recording_date_from_name(name: str) -> str | None:
+    for m in reversed(list(_FULL_DATETIME_RE.finditer(name))):
+        try:
+            dt = datetime(
+                int(m.group(1)),
+                int(m.group(2)),
+                int(m.group(3)),
+                int(m.group(4)),
+                int(m.group(5)),
+                int(m.group(6)),
+            )
+            return dt.strftime("%Y-%m-%d")
+        except ValueError:
+            continue
+    for m in reversed(list(_DATE_ONLY_RE.finditer(name))):
+        try:
+            dt = datetime(int(m.group(1)), int(m.group(2)), int(m.group(3)))
+            return dt.strftime("%Y-%m-%d")
+        except ValueError:
+            continue
+    return None
+
+
+def _collect_transcripts_for_date(transcript_dir: Path, recording_date: str) -> list[Path]:
+    items: list[Path] = []
+    for path in sorted(transcript_dir.glob("*.txt")):
+        if _extract_recording_date_from_name(path.name) == recording_date:
+            items.append(path)
+    return items
+
+
+def _build_daily_summary_input(recording_date: str, transcript_paths: list[Path]) -> str:
+    chunks: list[str] = [
+        f"録音日: {recording_date}",
+        f"対象文字起こし数: {len(transcript_paths)}",
+        "以下は同日の文字起こしです。1日全体の総括を作成してください。",
+    ]
+    for transcript_path in transcript_paths:
+        text = transcript_path.read_text(encoding="utf-8", errors="ignore").strip()
+        if not text:
+            continue
+        chunks.append(f"\n### {transcript_path.name}\n{text}")
+    return "\n".join(chunks).strip()
+
+
+def _write_daily_summaries(
+    cfg: Config,
+    recording_dates: set[str],
+    progress_cb: ProgressCallback | None,
+) -> None:
+    if not recording_dates or not cfg.summarizer.enabled:
+        return
+
+    transcript_dir = cfg.storage.base_dir / cfg.storage.transcript_dir_name
+    summary_dir = cfg.storage.base_dir / cfg.storage.summary_dir_name
+    summary_dir.mkdir(parents=True, exist_ok=True)
+
+    dates = sorted(recording_dates)
+    for idx, recording_date in enumerate(dates, start=1):
+        _emit(
+            progress_cb,
+            ProgressEvent(
+                state="processing",
+                message=f"[daily {idx}/{len(dates)}] summarize {recording_date}",
+                percent=99,
+                total=len(dates),
+                current=idx,
+            ),
+        )
+        transcript_paths = _collect_transcripts_for_date(transcript_dir, recording_date)
+        if not transcript_paths:
+            LOGGER.info("Daily summary skipped (no transcripts): %s", recording_date)
+            continue
+
+        daily_input = _build_daily_summary_input(recording_date, transcript_paths)
+        out_path = summary_dir / f"daily_{recording_date}.md"
+        try:
+            summary = summarize_text(daily_input, cfg.summarizer)
+            out_path.write_text(summary, encoding="utf-8")
+            LOGGER.info("Daily summary generated: %s", out_path)
+        except Exception as e:
+            LOGGER.warning("Daily summary failed for %s: %s", recording_date, e)
+            out_path.write_text(f"Daily summary failed: {e}\n", encoding="utf-8")
+
+
 def run_once(cfg: Config, state: StateStore, progress_cb: ProgressCallback | None = None) -> RunResult:
     result = RunResult()
     mount = find_usb_mount(cfg.usb.device_name, cfg.usb.mount_roots)
@@ -103,10 +191,15 @@ def run_once(cfg: Config, state: StateStore, progress_cb: ProgressCallback | Non
         _emit(progress_cb, ProgressEvent(state="complete", message="No new audio", percent=100, total=0, current=0))
         return result
 
+    recording_dates: set[str] = set()
     for idx, source in enumerate(pending, start=1):
         try:
             key = _to_key(source, mount)
             task = _build_task(cfg, source, mount, key)
+            recording_date = (
+                _extract_recording_date_from_name(task.relative_path)
+                or _extract_recording_date_from_name(task.copied_path.name)
+            )
             LOGGER.info("Processing: %s", task.relative_path)
             base = int(((idx - 1) / total_pending) * 100)
             _emit(
@@ -173,6 +266,8 @@ def run_once(cfg: Config, state: StateStore, progress_cb: ProgressCallback | Non
             )
             state.save()
             result.processed += 1
+            if recording_date:
+                recording_dates.add(recording_date)
             done_pct = int((idx / total_pending) * 100)
             _emit(
                 progress_cb,
@@ -197,6 +292,8 @@ def run_once(cfg: Config, state: StateStore, progress_cb: ProgressCallback | Non
                     current=idx,
                 ),
             )
+
+    _write_daily_summaries(cfg, recording_dates, progress_cb)
 
     _emit(
         progress_cb,

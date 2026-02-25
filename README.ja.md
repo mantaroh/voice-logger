@@ -22,6 +22,7 @@ USB録音デバイスを監視し、新規音声をローカル保存してUSB�
 - 取り込み成功後にUSB元ファイルを削除
 - `whisper.cpp` 実行で文字起こし保存
 - 要約プロバイダ切り替え（`openai / anthropic / gemini / openrouter / cloudflare`）
+- 同日に属する文字起こしを集約して日次総括（`daily_YYYY-MM-DD.md`）を生成
 - トレイ常駐実行（`voice-logger-tray`）
 - トレイメニューの `Settings...` から `config.toml` を編集
 - CLI実行 (`run`, `once`)
@@ -175,6 +176,7 @@ voice-logger --config $HOME/code/voice-logger/config.toml run
 - `raw/`: USBから取り込んだ音声
 - `transcripts/`: 文字起こし `.txt`
 - `summaries/`: 要約 `.md`（enabled時）
+  - `daily_YYYY-MM-DD.md`: 録音日ごとの1日総括（enabled時）
 - `.voice_logger_state.json`: 処理済み管理
 
 ## 自動起動
