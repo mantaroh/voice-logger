@@ -33,6 +33,7 @@ USB録音デバイスを監視し、新規音声をローカル保存してUSB�
 - Python `3.11+`
 - GUIセッション（トレイ表示のため）
 - インストールスクリプト用に `git`, `cmake`, `curl`, C++コンパイラ（`clang++` または `g++`）
+- `ffmpeg`, `ffprobe`（ノイズ低減・VAD前処理・チャンク切り出し）
 
 ## macOS / Ubuntu インストールと起動
 
@@ -119,6 +120,10 @@ cp config.example.toml config.toml
 - `[usb].device_name`: USBボリューム名
 - `[storage].base_dir`: ローカル保存先
 - `[whisper].cli_path`, `[whisper].model_path`
+- `[whisper].enable_denoise`, `[whisper].denoise_filter`
+- `[whisper].enable_vad`, `[whisper].vad_padding_seconds`
+- `[whisper].vad_min_silence_duration_ms`, `[whisper].vad_max_speech_duration_seconds`
+- `[whisper].max_chunk_seconds`
 - `[summarizer]`（有効時）
 
 `install_whisper_kotoba.sh` は以下をインストールします:

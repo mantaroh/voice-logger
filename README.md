@@ -32,6 +32,7 @@ It should also work with other USB-recognizable voice recorders that expose audi
 - Python `3.11+`
 - GUI session (for tray mode)
 - `git`, `cmake`, `curl`, C++ compiler (`clang++` or `g++`) for install script
+- `ffmpeg`, `ffprobe` (denoise/VAD preprocessing and chunk extraction)
 
 ## Install
 
@@ -49,6 +50,10 @@ Edit `config.toml`:
 - `[usb].device_name`
 - `[storage].base_dir`
 - `[whisper].cli_path`, `[whisper].model_path`
+- `[whisper].enable_denoise`, `[whisper].denoise_filter`
+- `[whisper].enable_vad`, `[whisper].vad_padding_seconds`
+- `[whisper].vad_min_silence_duration_ms`, `[whisper].vad_max_speech_duration_seconds`
+- `[whisper].max_chunk_seconds`
 - `[summarizer]` (optional)
 
 `install_whisper_kotoba.sh` installs:

@@ -26,6 +26,20 @@ model_path = "~/.local/share/voice-logger/models/kotoba-whisper-v2.2/kotoba-whis
 language = "ja"
 # 例: ["-t", "8", "-oj"]
 extra_args = ["-t", "8"]
+# 長時間・ノイズ環境向けパイプライン
+enable_denoise = true
+# ffmpeg -af に渡すフィルタ
+denoise_filter = "afftdn=nf=-25"
+enable_vad = true
+vad_threshold = 0.5
+# 語頭・語尾の欠落防止マージン（0.5〜1.0推奨）
+vad_padding_seconds = 0.7
+# 2秒未満の無音は同一発話として扱う
+vad_min_silence_duration_ms = 2000
+# 30秒の壁対策（VAD側）
+vad_max_speech_duration_seconds = 30.0
+# 念のためチャンク側でも30秒上限を強制
+max_chunk_seconds = 30.0
 
 [summarizer]
 enabled = true

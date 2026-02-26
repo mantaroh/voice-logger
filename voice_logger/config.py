@@ -38,6 +38,14 @@ class WhisperConfig:
     model_path: Path
     language: str = "ja"
     extra_args: list[str] = field(default_factory=list)
+    enable_denoise: bool = True
+    denoise_filter: str = "afftdn=nf=-25"
+    enable_vad: bool = True
+    vad_threshold: float = 0.5
+    vad_padding_seconds: float = 0.7
+    vad_min_silence_duration_ms: int = 2000
+    vad_max_speech_duration_seconds: float = 30.0
+    max_chunk_seconds: float = 30.0
 
 
 @dataclass(slots=True)
@@ -157,6 +165,14 @@ def load_config(path: Path) -> Config:
             model_path=_expand_path(whisper_model),
             language=str(whisper_data.get("language", "ja")),
             extra_args=list(whisper_data.get("extra_args", [])),
+            enable_denoise=bool(whisper_data.get("enable_denoise", True)),
+            denoise_filter=str(whisper_data.get("denoise_filter", "afftdn=nf=-25")).strip(),
+            enable_vad=bool(whisper_data.get("enable_vad", True)),
+            vad_threshold=float(whisper_data.get("vad_threshold", 0.5)),
+            vad_padding_seconds=float(whisper_data.get("vad_padding_seconds", 0.7)),
+            vad_min_silence_duration_ms=int(whisper_data.get("vad_min_silence_duration_ms", 2000)),
+            vad_max_speech_duration_seconds=float(whisper_data.get("vad_max_speech_duration_seconds", 30.0)),
+            max_chunk_seconds=float(whisper_data.get("max_chunk_seconds", 30.0)),
         ),
         summarizer=SummarizerConfig(
             enabled=summarizer_enabled,
@@ -175,6 +191,14 @@ def load_config(path: Path) -> Config:
 
     if cfg.app.poll_interval_seconds < 1:
         raise ValueError("[app].poll_interval_seconds must be >= 1")
+    if cfg.whisper.vad_padding_seconds < 0:
+        raise ValueError("[whisper].vad_padding_seconds must be >= 0")
+    if cfg.whisper.vad_min_silence_duration_ms < 0:
+        raise ValueError("[whisper].vad_min_silence_duration_ms must be >= 0")
+    if cfg.whisper.vad_max_speech_duration_seconds <= 0:
+        raise ValueError("[whisper].vad_max_speech_duration_seconds must be > 0")
+    if cfg.whisper.max_chunk_seconds <= 0:
+        raise ValueError("[whisper].max_chunk_seconds must be > 0")
 
     if sys.platform.startswith("darwin") and Path("/Volumes") not in cfg.usb.mount_roots:
         cfg.usb.mount_roots.insert(0, Path("/Volumes"))
@@ -221,6 +245,14 @@ def save_config(path: Path, cfg: Config) -> None:
         f"model_path = {_toml_string(str(cfg.whisper.model_path))}",
         f"language = {_toml_string(cfg.whisper.language)}",
         f"extra_args = {_toml_str_list(cfg.whisper.extra_args)}",
+        f"enable_denoise = {'true' if cfg.whisper.enable_denoise else 'false'}",
+        f"denoise_filter = {_toml_string(cfg.whisper.denoise_filter)}",
+        f"enable_vad = {'true' if cfg.whisper.enable_vad else 'false'}",
+        f"vad_threshold = {cfg.whisper.vad_threshold}",
+        f"vad_padding_seconds = {cfg.whisper.vad_padding_seconds}",
+        f"vad_min_silence_duration_ms = {cfg.whisper.vad_min_silence_duration_ms}",
+        f"vad_max_speech_duration_seconds = {cfg.whisper.vad_max_speech_duration_seconds}",
+        f"max_chunk_seconds = {cfg.whisper.max_chunk_seconds}",
         "",
         "[summarizer]",
         f"enabled = {'true' if cfg.summarizer.enabled else 'false'}",
